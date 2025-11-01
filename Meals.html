@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Meal Roulette</title>
+  <script>
+    // Force correct MIME type in Safari
+    if (window.location.protocol === 'file:') {
+      document.write('<h2 style="color:red;text-align:center;padding:20px;">Please open this file in Safari via "Share → Open in Safari" or host it online.</h2>');
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      color: #333;
+      text-align: center;
+      padding: 40px 20px;
+      margin: 0;
+    }
+    h1 { font-size: 2.5rem; margin-bottom: 10px; color: #d63384; }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    button {
+      background: #d63384;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.3rem;
+      border-radius: 50px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    button:hover { background: #b0246b; transform: scale(1.05); }
+    .meal { margin-top: 30px; font-size: 1.8rem; font-weight: 600; color: #d63384; }
+    .ingredients {
+      text-align: left;
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 12px;
+      margin-top: 15px;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Meal Roulette</h1>
+  <p>Click to randomly pick today’s meal + ingredients (for 2)</p>
+
+  <div class="container">
+    <div id="result">
+      <p><em>Click the button to roll...</em></p>
+    </div>
+    <button onclick="generateMeal()">Roll the Dice</button>
+  </div>
+
+  <script>
+    const meals = [
+      { name: "Uttapam", ingredients: "Rice (½ cup), Urad dal (¼ cup), Onion, Tomato, Green chili, Coriander, Oil, Salt" },
+      { name: "Roti + Bhindi + Salad + Dahi", ingredients: "Wheat flour (1 cup), Bhindi (250g), Onion, Tomato, Cucumber, Dahi (200g), Oil, Spices" },
+      { name: "Pav Bhaaji + Onion + Lemon", ingredients: "Pav (4), Potato (2), Peas, Cauliflower, Tomato (3), Onion (2), Lemon (1), Butter, Pav bhaji masala" },
+      { name: "Moong Daal Chila + Green Chutney", ingredients: "Moong dal (½ cup), Green chili, Ginger, Coriander, Mint, Lemon, Oil" },
+      { name: "Paneer Bhurji + Paratha + Chaas", ingredients: "Paneer (200g), Onion, Tomato, Capsicum, Wheat flour (1 cup), Buttermilk (300ml)" },
+      { name: "Vaghareli Khichdi + Masala Chaas + Papad", ingredients: "Rice (½ cup), Moong dal (¼ cup), Potato, Peas, Spices, Buttermilk, Papad (4)" },
+      { name: "Mix Veg Millet Paratha + Dahi", ingredients: "Bajra/Jowar flour (1 cup), Carrot, Beans, Peas, Dahi (200g)" },
+      { name: "Jita Rice + Moong Daal + Papad + Salad", ingredients: "Rice (½ cup), Moong dal (¼ cup), Onion, Tomato, Cucumber, Papad" },
+      { name: "Pink Sauce Pasta + Garlic Bread", ingredients: "Pasta (150g), Milk (1 cup), Cheese, Tomato puree, Butter, Garlic bread (4 slices)" },
+      { name: "Paneer Veg Sandwich + Chutney", ingredients: "Bread (6 slices), Paneer (100g), Capsicum, Onion, Green chutney" },
+      { name: "Jeera Rice + Dal Fry + Chaas", ingredients: "Rice (½ cup), Toor dal (½ cup), Jeera, Buttermilk (300ml)" },
+      { name: "Oats & Banana Smoothie", ingredients: "Oats (½ cup), Banana (2), Milk (1 glass), Honey" },
+      { name: "Loki Chana Daal + Rotli + Salad", ingredients: "Loki (250g), Chana dal (½ cup), Wheat flour (1 cup), Onion, Tomato, Cucumber" },
+      { name: "Masala Dosa", ingredients: "Dosa batter (rice+urad), Potato (2), Onion, Mustard seeds, Oil" },
+      { name: "Bhakhri + Sev Tameta + Kanda + Achar", ingredients: "Bajra flour (1 cup), Tomato (3), Sev, Onion, Pickle" },
+      { name: "Masala Bhaat + Raita", ingredients: "Rice (½ cup), Ivy gourd/Potato, Spices, Dahi, Cucumber" },
+      { name: "Thepla + Chai", ingredients: "Wheat flour (1 cup), Methi, Spices, Tea, Milk, Sugar" },
+      { name: "Thepla + Aloo Bhaji + Dahi + Achar", ingredients: "Wheat flour (1 cup), Methi, Potato (2), Dahi, Pickle" },
+      { name: "Palak Corn Sabji + Pulav + Raita", ingredients: "Palak (200g), Corn (1 cup), Rice, Dahi, Cucumber" },
+      { name: "Noodles + Soup", ingredients: "Noodles (150g), Mixed veg, Soy sauce, Veg stock (carrot, onion, celery)" },
+      { name: "Kanda Poha", ingredients: "Poha (1 cup), Onion (2), Peanut, Mustard, Curry leaves" },
+      { name: "Loko Sabji + Roti + Salad", ingredients: "Bottle gourd (250g), Spices, Wheat flour, Onion, Tomato, Cucumber" },
+      { name: "Bengan Bharta + Roti", ingredients: "Brinjal (1 large), Onion, Tomato, Wheat flour" },
+      { name: "Paneer Toast", ingredients: "Bread (4 slices), Paneer (100g), Butter, Spices" },
+      { name: "Bajra Rotli + Dahi Tikhari + Garlic Chutney", ingredients: "Bajra flour (1 cup), Dahi, Red chili, Garlic" },
+      { name: "Beans & Carrot Upma", ingredients: "Suji (1 cup), French beans, Carrot, Mustard, Curry leaves" },
+      { name: "Sautéed Veg with Grilled Paneer", ingredients: "Mixed veg, Paneer (150g), Butter, Herbs" },
+      { name: "Aloo Matar Sabji + Paratha", ingredients: "Potato (2), Peas (½ cup), Wheat flour (1 cup)" },
+      { name: "Veg Biryani + Raita", ingredients: "Rice (½ cup), Mixed veg, Spices, Dahi, Onion" },
+      { name: "Aloo Gobi Sabji + Roti + Salad + Chaas", ingredients: "Potato, Cauliflower, Wheat flour, Salad, Buttermilk" },
+      { name: "Corn & Spinach Sandwich", ingredients: "Bread, Corn, Palak, Cheese" },
+      { name: "Gatte ki Sabji + Roti + Chaas + Achar", ingredients: "Besan (1 cup), Dahi, Spices, Wheat flour, Buttermilk, Pickle" },
+      { name: "Ragda Pattice", ingredients: "White peas (½ cup), Potato (3), Spices, Tamarind chutney" },
+      { name: "Onion Paratha", ingredients: "Wheat flour, Onion (2), Spices" },
+      { name: "Burger + Salad", ingredients: "Burger buns (2), Potato patty, Lettuce, Tomato, Cucumber" },
+      { name: "Rice Kadhi", ingredients: "Rice (½ cup), Dahi (1 cup), Besan, Spices" },
+      { name: "Mix Veg Bhakhri Pizza", ingredients: "Bajra flour, Mixed veg, Cheese, Pizza sauce" },
+      { name: "Palak Daal + Rice", ingredients: "Palak, Toor dal, Rice" },
+      { name: "Dum Aloo + Roti", ingredients: "Baby potato (250g), Spices, Wheat flour" },
+      { name: "Veg Paneer Wrap + Salad", ingredients: "Roti, Paneer, Veg, Mayo, Salad" },
+      { name: "Fried Rice + Soup", ingredients: "Rice, Mixed veg, Soy sauce, Veg stock" },
+      { name: "Undhiyu + Roti", ingredients: "Surti papdi, Purple yam, Brinjal, Banana, Methi muthia, Spices, Wheat flour" },
+      { name: "Manchurian + Fried Rice", ingredients: "Cabbage, Carrot, Cornflour, Soy sauce, Rice" },
+      { name: "Daal Dhokli + Rice", ingredients: "Wheat flour, Toor dal, Peanuts, Spices, Rice" }
+    ];
+
+    function generateMeal() {
+      const i = Math.floor(Math.random() * meals.length);
+      const m = meals[i];
+      document.getElementById("result").innerHTML = `
+        <div class="meal">${m.name}</div>
+        <div class="ingredients">
+          <strong>Ingredients (for 2):</strong><br>
+          ${m.ingredients.replace(/, /g, '<br>')}
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
