@@ -5,124 +5,376 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Meal Roulette</title>
   <script>
-    // Force correct MIME type in Safari
     if (window.location.protocol === 'file:') {
-      document.write('<h2 style="color:red;text-align:center;padding:20px;">Please open this file in Safari via "Share → Open in Safari" or host it online.</h2>');
+      document.write('<h2 style="color:red;text-align:center;padding:20px;">Please open in Safari via "Share → Open in Safari" or host online.</h2>');
     }
   </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+    :root {
+      --primary: #d63384;
+      --primary-dark: #b0246b;
+      --bg-gradient: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      --card-bg: white;
+      --text: #333;
+      --light: #f8f9fa;
+    }
+    * { box-sizing: border-box; }
     body {
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-      color: #333;
+      background: var(--bg-gradient);
+      color: var(--text);
       text-align: center;
-      padding: 40px 20px;
+      padding: 20px;
       margin: 0;
+      min-height: 100vh;
     }
-    h1 { font-size: 2.5rem; margin-bottom: 10px; color: #d63384; }
+    h1 {
+      font-size: 2.8rem;
+      margin: 20px 0 10px;
+      color: var(--primary);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    p { margin: 8px 0; color: #555; }
     .container {
-      max-width: 600px;
-      margin: 40px auto;
-      background: white;
+      max-width: 650px;
+      margin: 30px auto;
+      background: var(--card-bg);
       padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      border-radius: 24px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+      transition: transform 0.3s ease;
     }
+    .container:hover { transform: translateY(-5px); }
     button {
-      background: #d63384;
+      background: var(--primary);
       color: white;
       border: none;
-      padding: 15px 30px;
-      font-size: 1.3rem;
+      padding: 14px 28px;
+      font-size: 1.2rem;
+      font-weight: 600;
       border-radius: 50px;
       cursor: pointer;
-      margin-top: 20px;
+      margin: 10px 8px;
+      transition: all 0.3s ease;
+      min-width: 140px;
     }
-    button:hover { background: #b0246b; transform: scale(1.05); }
-    .meal { margin-top: 30px; font-size: 1.8rem; font-weight: 600; color: #d63384; }
+    button:hover {
+      background: var(--primary-dark);
+      transform: scale(1.07);
+      box-shadow: 0 5px 15px rgba(214, 51, 132, 0.3);
+    }
+    button.active {
+      background: var(--primary-dark);
+      box-shadow: inset 0 3px 8px rgba(0,0,0,0.2);
+    }
+    .step { display: none; animation: fadeIn 0.5s ease; }
+    .step.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    .meal { margin: 25px 0; font-size: 2rem; font-weight: 700; color: var(--primary); }
     .ingredients {
       text-align: left;
-      background: #f8f9fa;
-      padding: 15px;
-      border-radius: 12px;
+      background: var(--light);
+      padding: 18px;
+      border-radius: 14px;
       margin-top: 15px;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      border-left: 5px solid var(--primary);
+    }
+    .tags {
+      margin: 15px 0;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .tag {
+      display: inline-block;
+      background: #ffe6f0;
+      color: var(--primary);
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin: 4px;
+      font-weight: 600;
+    }
+    .input-group {
+      margin: 20px 0;
+      text-align: left;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #444;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      font-family: inherit;
       font-size: 1rem;
-      line-height: 1.6;
+      transition: border 0.3s;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .back-btn {
+      background: #666;
+      font-size: 1rem;
+      padding: 10px 20px;
+    }
+    .back-btn:hover { background: #444; }
+    .or-divider {
+      margin: 25px 0;
+      font-weight: 600;
+      color: #888;
+      position: relative;
+    }
+    .or-divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: #ddd;
+      z-index: 0;
+    }
+    .or-divider span {
+      background: white;
+      padding: 0 15px;
+      position: relative;
+      z-index: 1;
+    }
+    .final-buttons {
+      margin-top: 25px;
     }
   </style>
 </head>
 <body>
 
-  <h1>Meal Roulette</h1>
-  <p>Click to randomly pick today’s meal + ingredients (for 2)</p>
+  <h1>🍽️ Meal Roulette</h1>
+  <p>Let’s find your perfect meal — quick, smart, and delicious!</p>
 
   <div class="container">
-    <div id="result">
-      <p><em>Click the button to roll...</em></p>
+
+    <!-- Step 1: Meal Type -->
+    <div id="step1" class="step active">
+      <h2>What are you in the mood for?</h2>
+      <button onclick="setPreference('type', 'breakfast')">🥞 Breakfast</button>
+      <button onclick="setPreference('type', 'meal')">🍛 Lunch/Dinner</button>
     </div>
-    <button onclick="generateMeal()">Roll the Dice</button>
+
+    <!-- Step 2: Time -->
+    <div id="step2" class="step">
+      <h2>How much time do you have?</h2>
+      <button onclick="setPreference('time', 'quick')">⚡ Quick (<30 min)</button>
+      <button onclick="setPreference('time', 'medium')">⏳ Medium (30-60 min)</button>
+      <button onclick="setPreference('time', 'long')">🍲 Elongated (>60 min)</button>
+      <div style="margin-top:15px;">
+        <button class="back-btn" onclick="goBack(1)">← Back</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Style -->
+    <div id="step3" class="step">
+      <h2>Any dietary preference?</h2>
+      <button onclick="setPreference('style', 'healthy')">🥗 Healthy (Low Oil)</button>
+      <button onclick="setPreference('style', 'indian')">🌶️ Indian</button>
+      <button onclick="setPreference('style', 'continental')">🍝 Continental</button>
+      <button onclick="setPreference('style', 'any')">🎲 Any</button>
+      <div style="margin-top:15px;">
+        <button class="back-btn" onclick="goBack(2)">← Back</button>
+      </div>
+    </div>
+
+    <!-- Ingredient Mode -->
+    <div id="ingredientMode" class="step">
+      <h2>🍅 I Have These Ingredients</h2>
+      <div class="input-group">
+        <label>Type ingredients you have (comma-separated):</label>
+        <textarea id="userIngredients" rows="3" placeholder="e.g. potato, tomato, paneer, rice, onion"></textarea>
+      </div>
+      <button onclick="suggestFromIngredients()">Suggest Dish</button>
+      <div class="or-divider"><span>OR</span></div>
+      <button onclick="rollWithFilters()">Roll with Filters</button>
+      <div style="margin-top:15px;">
+        <button class="back-btn" onclick="goBack(3)">← Back</button>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div id="result" class="step">
+      <div id="mealDisplay"></div>
+      <div class="final-buttons">
+        <button onclick="startOver()">🎲 Roll Again</button>
+        <button onclick="switchToIngredients()" class="back-btn">🍴 I Have Ingredients</button>
+      </div>
+    </div>
+
+    <!-- Start Button -->
+    <div id="startScreen" class="step active">
+      <button onclick="startRoulette()" style="font-size:1.5rem;padding:18px 40px;">🎰 Start Meal Roulette</button>
+      <div class="or-divider"><span>OR</span></div>
+      <button onclick="switchToIngredients()" style="background:#6c757d;">🍅 I Have Ingredients</button>
+    </div>
+
   </div>
 
   <script>
+    // Meal Database with metadata
     const meals = [
-      { name: "Uttapam", ingredients: "Rice (½ cup), Urad dal (¼ cup), Onion, Tomato, Green chili, Coriander, Oil, Salt" },
-      { name: "Roti + Bhindi + Salad + Dahi", ingredients: "Wheat flour (1 cup), Bhindi (250g), Onion, Tomato, Cucumber, Dahi (200g), Oil, Spices" },
-      { name: "Pav Bhaaji + Onion + Lemon", ingredients: "Pav (4), Potato (2), Peas, Cauliflower, Tomato (3), Onion (2), Lemon (1), Butter, Pav bhaji masala" },
-      { name: "Moong Daal Chila + Green Chutney", ingredients: "Moong dal (½ cup), Green chili, Ginger, Coriander, Mint, Lemon, Oil" },
-      { name: "Paneer Bhurji + Paratha + Chaas", ingredients: "Paneer (200g), Onion, Tomato, Capsicum, Wheat flour (1 cup), Buttermilk (300ml)" },
-      { name: "Vaghareli Khichdi + Masala Chaas + Papad", ingredients: "Rice (½ cup), Moong dal (¼ cup), Potato, Peas, Spices, Buttermilk, Papad (4)" },
-      { name: "Mix Veg Millet Paratha + Dahi", ingredients: "Bajra/Jowar flour (1 cup), Carrot, Beans, Peas, Dahi (200g)" },
-      { name: "Jita Rice + Moong Daal + Papad + Salad", ingredients: "Rice (½ cup), Moong dal (¼ cup), Onion, Tomato, Cucumber, Papad" },
-      { name: "Pink Sauce Pasta + Garlic Bread", ingredients: "Pasta (150g), Milk (1 cup), Cheese, Tomato puree, Butter, Garlic bread (4 slices)" },
-      { name: "Paneer Veg Sandwich + Chutney", ingredients: "Bread (6 slices), Paneer (100g), Capsicum, Onion, Green chutney" },
-      { name: "Jeera Rice + Dal Fry + Chaas", ingredients: "Rice (½ cup), Toor dal (½ cup), Jeera, Buttermilk (300ml)" },
-      { name: "Oats & Banana Smoothie", ingredients: "Oats (½ cup), Banana (2), Milk (1 glass), Honey" },
-      { name: "Loki Chana Daal + Rotli + Salad", ingredients: "Loki (250g), Chana dal (½ cup), Wheat flour (1 cup), Onion, Tomato, Cucumber" },
-      { name: "Masala Dosa", ingredients: "Dosa batter (rice+urad), Potato (2), Onion, Mustard seeds, Oil" },
-      { name: "Bhakhri + Sev Tameta + Kanda + Achar", ingredients: "Bajra flour (1 cup), Tomato (3), Sev, Onion, Pickle" },
-      { name: "Masala Bhaat + Raita", ingredients: "Rice (½ cup), Ivy gourd/Potato, Spices, Dahi, Cucumber" },
-      { name: "Thepla + Chai", ingredients: "Wheat flour (1 cup), Methi, Spices, Tea, Milk, Sugar" },
-      { name: "Thepla + Aloo Bhaji + Dahi + Achar", ingredients: "Wheat flour (1 cup), Methi, Potato (2), Dahi, Pickle" },
-      { name: "Palak Corn Sabji + Pulav + Raita", ingredients: "Palak (200g), Corn (1 cup), Rice, Dahi, Cucumber" },
-      { name: "Noodles + Soup", ingredients: "Noodles (150g), Mixed veg, Soy sauce, Veg stock (carrot, onion, celery)" },
-      { name: "Kanda Poha", ingredients: "Poha (1 cup), Onion (2), Peanut, Mustard, Curry leaves" },
-      { name: "Loko Sabji + Roti + Salad", ingredients: "Bottle gourd (250g), Spices, Wheat flour, Onion, Tomato, Cucumber" },
-      { name: "Bengan Bharta + Roti", ingredients: "Brinjal (1 large), Onion, Tomato, Wheat flour" },
-      { name: "Paneer Toast", ingredients: "Bread (4 slices), Paneer (100g), Butter, Spices" },
-      { name: "Bajra Rotli + Dahi Tikhari + Garlic Chutney", ingredients: "Bajra flour (1 cup), Dahi, Red chili, Garlic" },
-      { name: "Beans & Carrot Upma", ingredients: "Suji (1 cup), French beans, Carrot, Mustard, Curry leaves" },
-      { name: "Sautéed Veg with Grilled Paneer", ingredients: "Mixed veg, Paneer (150g), Butter, Herbs" },
-      { name: "Aloo Matar Sabji + Paratha", ingredients: "Potato (2), Peas (½ cup), Wheat flour (1 cup)" },
-      { name: "Veg Biryani + Raita", ingredients: "Rice (½ cup), Mixed veg, Spices, Dahi, Onion" },
-      { name: "Aloo Gobi Sabji + Roti + Salad + Chaas", ingredients: "Potato, Cauliflower, Wheat flour, Salad, Buttermilk" },
-      { name: "Corn & Spinach Sandwich", ingredients: "Bread, Corn, Palak, Cheese" },
-      { name: "Gatte ki Sabji + Roti + Chaas + Achar", ingredients: "Besan (1 cup), Dahi, Spices, Wheat flour, Buttermilk, Pickle" },
-      { name: "Ragda Pattice", ingredients: "White peas (½ cup), Potato (3), Spices, Tamarind chutney" },
-      { name: "Onion Paratha", ingredients: "Wheat flour, Onion (2), Spices" },
-      { name: "Burger + Salad", ingredients: "Burger buns (2), Potato patty, Lettuce, Tomato, Cucumber" },
-      { name: "Rice Kadhi", ingredients: "Rice (½ cup), Dahi (1 cup), Besan, Spices" },
-      { name: "Mix Veg Bhakhri Pizza", ingredients: "Bajra flour, Mixed veg, Cheese, Pizza sauce" },
-      { name: "Palak Daal + Rice", ingredients: "Palak, Toor dal, Rice" },
-      { name: "Dum Aloo + Roti", ingredients: "Baby potato (250g), Spices, Wheat flour" },
-      { name: "Veg Paneer Wrap + Salad", ingredients: "Roti, Paneer, Veg, Mayo, Salad" },
-      { name: "Fried Rice + Soup", ingredients: "Rice, Mixed veg, Soy sauce, Veg stock" },
-      { name: "Undhiyu + Roti", ingredients: "Surti papdi, Purple yam, Brinjal, Banana, Methi muthia, Spices, Wheat flour" },
-      { name: "Manchurian + Fried Rice", ingredients: "Cabbage, Carrot, Cornflour, Soy sauce, Rice" },
-      { name: "Daal Dhokli + Rice", ingredients: "Wheat flour, Toor dal, Peanuts, Spices, Rice" }
+      { name: "Uttapam", type: "breakfast", time: "medium", style: "indian", healthy: true, ingredients: ["rice", "urad dal", "onion", "tomato", "green chili", "coriander", "oil", "salt"] },
+      { name: "Roti + Bhindi + Salad + Dahi", type: "meal", time: "medium", style: "indian", healthy: true, ingredients: ["wheat flour", "bhindi", "onion", "tomato", "cucumber", "dahi", "oil", "spices"] },
+      { name: "Pav Bhaaji + Onion + Lemon", type: "meal", time: "medium", style: "indian", healthy: false, ingredients: ["pav", "potato", "peas", "cauliflower", "tomato", "onion", "lemon", "butter", "pav bhaji masala"] },
+      { name: "Moong Daal Chila + Green Chutney", type: "breakfast", time: "quick", style: "indian", healthy: true, ingredients: ["moong dal", "green chili", "ginger", "coriander", "mint", "lemon", "oil"] },
+      { name: "Paneer Bhurji + Paratha + Chaas", type: "meal", time: "medium", style: "indian", healthy: false, ingredients: ["paneer", "onion", "tomato", "capsicum", "wheat flour", "buttermilk"] },
+      { name: "Vaghareli Khichdi + Masala Chaas + Papad", type: "meal", time: "medium", style: "indian", healthy: true, ingredients: ["rice", "moong dal", "potato", "peas", "spices", "buttermilk", "papad"] },
+      { name: "Mix Veg Millet Paratha + Dahi", type: "meal", time: "medium", style: "indian", healthy: true, ingredients: ["bajra flour", "jowar flour", "carrot", "beans", "peas", "dahi"] },
+      { name: "Jita Rice + Moong Daal + Papad + Salad", type: "meal", time: "medium", style: "indian", healthy: true, ingredients: ["rice", "moong dal", "onion", "tomato", "cucumber", "papad"] },
+      { name: "Pink Sauce Pasta + Garlic Bread", type: "meal", time: "medium", style: "continental", healthy: false, ingredients: ["pasta", "milk", "cheese", "tomato puree", "butter", "garlic bread"] },
+      { name: "Paneer Veg Sandwich + Chutney", type: "breakfast", time: "quick", style: "indian", healthy: false, ingredients: ["bread", "paneer", "capsicum", "onion", "green chutney"] },
+      { name: "Jeera Rice + Dal Fry + Chaas", type: "meal", time: "medium", style: "indian", healthy: true, ingredients: ["rice", "toor dal", "jeera", "buttermilk"] },
+      { name: "Oats & Banana Smoothie", type: "breakfast", time: "quick", style: "continental", healthy: true, ingredients: ["oats", "banana", "milk", "honey"] },
+      { name: "Loki Chana Daal + Rotli + Salad", type: "meal", time: "medium", style: "indian", healthy: true, ingredients: ["loki", "chana dal", "wheat flour", "onion", "tomato", "cucumber"] },
+      { name: "Masala Dosa", type: "breakfast", time: "long", style: "indian", healthy: false, ingredients: ["dosa batter", "rice", "urad", "potato", "onion", "mustard seeds", "oil"] },
+      { name: "Bhakhri + Sev Tameta + Kanda + Achar", type: "meal", time: "medium", style: "indian", healthy: false, ingredients: ["bajra flour", "tomato", "sev", "onion", "pickle"] },
+      { name: "Masala Bhaat + Raita", type: "meal", time: "medium", style: "indian", healthy: true, ingredients: ["rice", "ivy gourd", "potato", "spices", "dahi", "cucumber"] },
+      { name: "Thepla + Chai", type: "breakfast", time: "quick", style: "indian", healthy: true, ingredients: ["wheat flour", "methi", "spices", "tea", "milk", "sugar"] },
+      { name: "Kanda Poha", type: "breakfast", time: "quick", style: "indian", healthy: true, ingredients: ["poha", "onion", "peanut", "mustard", "curry leaves"] },
+      { name: "Beans & Carrot Upma", type: "breakfast", time: "quick", style: "indian", healthy: true, ingredients: ["suji", "french beans", "carrot", "mustard", "curry leaves"] },
+      { name: "Noodles + Soup", type: "meal", time: "quick", style: "continental", healthy: false, ingredients: ["noodles", "mixed veg", "soy sauce", "veg stock", "carrot", "onion", "celery"] },
+      { name: "Veg Biryani + Raita", type: "meal", time: "long", style: "indian", healthy: false, ingredients: ["rice", "mixed veg", "spices", "dahi", "onion"] },
+      { name: "Undhiyu + Roti", type: "meal", time: "long", style: "indian", healthy: false, ingredients: ["surti papdi", "purple yam", "brinjal", "banana", "methi muthia", "spices", "wheat flour"] },
+      { name: "Manchurian + Fried Rice", type: "meal", time: "medium", style: "continental", healthy: false, ingredients: ["cabbage", "carrot", "cornflour", "soy sauce", "rice"] },
+      { name: "Daal Dhokli + Rice", type: "meal", time: "long", style: "indian", healthy: true, ingredients: ["wheat flour", "toor dal", "peanuts", "spices", "rice"] }
     ];
 
-    function generateMeal() {
-      const i = Math.floor(Math.random() * meals.length);
-      const m = meals[i];
-      document.getElementById("result").innerHTML = `
-        <div class="meal">${m.name}</div>
+    let preferences = {};
+    let filteredMeals = [...meals];
+
+    function startRoulette() {
+      hideAll();
+      show("step1");
+    }
+
+    function switchToIngredients() {
+      hideAll();
+      show("ingredientMode");
+    }
+
+    function setPreference(key, value) {
+      preferences[key] = value;
+      nextStep();
+    }
+
+    function nextStep() {
+      if (!preferences.type) return show("step1");
+      if (!preferences.time) return show("step2");
+      if (!preferences.style) return show("step3");
+      rollWithFilters();
+    }
+
+    function goBack(step) {
+      hideAll();
+      show(`step${step}`);
+    }
+
+    function rollWithFilters() {
+      filteredMeals = meals.filter(m => {
+        if (preferences.type && m.type !== preferences.type) return false;
+        if (preferences.time === 'quick' && m.time !== 'quick') return false;
+        if (preferences.time === 'medium' && !['medium'].includes(m.time)) return false;
+        if (preferences.time === 'long' && m.time !== 'long') return false;
+        if (preferences.style === 'healthy' && !m.healthy) return false;
+        if (preferences.style === 'indian' && m.style !== 'indian') return false;
+        if (preferences.style === 'continental' && m.style !== 'continental') return false;
+        return true;
+      });
+
+      if (filteredMeals.length === 0) {
+        alert("No meals match your filters! Try relaxing some preferences.");
+        startOver();
+        return;
+      }
+
+      const meal = filteredMeals[Math.floor(Math.random() * filteredMeals.length)];
+      showResult(meal, "Based on your preferences");
+    }
+
+    function suggestFromIngredients() {
+      const input = document.getElementById("userIngredients").value.trim().toLowerCase();
+      if (!input) return alert("Please enter at least one ingredient!");
+
+      const userItems = input.split(',').map(i => i.trim()).filter(i => i);
+
+      const scored = meals.map(meal => {
+        const matchCount = meal.ingredients.filter(ing => 
+          userItems.some(u => ing.includes(u) || u.includes(ing))
+        ).length;
+        return { meal, score: matchCount };
+      })
+      .filter(s => s.score > 0)
+      .sort((a, b) => b.score - a.score);
+
+      if (scored.length === 0) {
+        alert("No dishes found with those ingredients. Try common ones like 'potato', 'rice', 'paneer'.");
+        return;
+      }
+
+      const best = scored[0].meal;
+      const coverage = ((scored[0].score / best.ingredients.length) * 100).toFixed(0);
+      showResult(best, `Best match: ${coverage}% ingredients covered`);
+    }
+
+    function showResult(meal, subtitle) {
+      const tags = [];
+      if (meal.type === 'breakfast') tags.push('Breakfast');
+      else tags.push('Meal');
+      if (meal.time === 'quick') tags.push('⚡ Quick');
+      if (meal.time === 'medium') tags.push('⏳ 30-60 min');
+      if (meal.time === 'long') tags.push('🍲 >60 min');
+      if (meal.healthy) tags.push('🥗 Healthy');
+      tags.push(meal.style.charAt(0).toUpperCase() + meal.style.slice(1));
+
+      document.getElementById("mealDisplay").innerHTML = `
+        <p style="color:#666;font-size:0.95rem;">${subtitle}</p>
+        <div class="meal">${meal.name}</div>
+        <div class="tags">${tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
         <div class="ingredients">
           <strong>Ingredients (for 2):</strong><br>
-          ${m.ingredients.replace(/, /g, '<br>')}
+          ${meal.ingredients.map(i => `• ${capitalize(i)}`).join('<br>')}
         </div>
       `;
+      hideAll();
+      show("result");
     }
+
+    function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function startOver() {
+      preferences = {};
+      filteredMeals = [...meals];
+      hideAll();
+      show("startScreen");
+    }
+
+    function show(id) {
+      document.getElementById(id).classList.add("active");
+    }
+
+    function hideAll() {
+      document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+    }
+
+    // Auto-start on load
+    window.onload = () => {
+      hideAll();
+      show("startScreen");
+    };
   </script>
 </body>
 </html>
