@@ -18,16 +18,24 @@
       --card-bg: white;
       --text: #333;
       --light: #f8f9fa;
+      --shadow: 0 15px 35px rgba(0,0,0,0.12);
     }
-    * { box-sizing: border-box; }
+    [data-theme="dark"] {
+      --bg-gradient: linear-gradient(135deg, #2c1a3d, #1a0d2e);
+      --card-bg: #1a1a2e;
+      --text: #e0e0ff;
+      --light: #16213e;
+      --shadow: 0 15px 35px rgba(0,0,0,0.4);
+    }
+    * { box-sizing: border-box; margin:0; padding:0; }
     body {
       font-family: 'Poppins', sans-serif;
       background: var(--bg-gradient);
       color: var(--text);
       text-align: center;
       padding: 20px;
-      margin: 0;
       min-height: 100vh;
+      transition: background 0.5s ease;
     }
     h1 {
       font-size: 2.8rem;
@@ -35,17 +43,15 @@
       color: var(--primary);
       text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    p { margin: 8px 0; color: #555; }
     .container {
-      max-width: 650px;
+      max-width: 680px;
       margin: 30px auto;
       background: var(--card-bg);
       padding: 30px;
       border-radius: 24px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.12);
-      transition: transform 0.3s ease;
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
     }
-    .container:hover { transform: translateY(-5px); }
     button {
       background: var(--primary);
       color: white;
@@ -64,10 +70,6 @@
       transform: scale(1.07);
       box-shadow: 0 5px 15px rgba(214, 51, 132, 0.3);
     }
-    button.active {
-      background: var(--primary-dark);
-      box-shadow: inset 0 3px 8px rgba(0,0,0,0.2);
-    }
     .step { display: none; animation: fadeIn 0.5s ease; }
     .step.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
@@ -82,11 +84,7 @@
       line-height: 1.7;
       border-left: 5px solid var(--primary);
     }
-    .tags {
-      margin: 15px 0;
-      font-size: 0.9rem;
-      color: #666;
-    }
+    .tags { margin: 15px 0; font-size: 0.9rem; color: #aaa; }
     .tag {
       display: inline-block;
       background: #ffe6f0;
@@ -96,179 +94,238 @@
       margin: 4px;
       font-weight: 600;
     }
-    .input-group {
-      margin: 20px 0;
-      text-align: left;
-    }
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: #444;
-    }
-    input, textarea {
+    [data-theme="dark"] .tag { background: #3a1a3d; color: #ff99cc; }
+    .input-group { margin: 20px 0; text-align: left; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; color: #444; }
+    [data-theme="dark"] label { color: #ccc; }
+    input, textarea, select {
       width: 100%;
       padding: 12px;
       border: 2px solid #ddd;
       border-radius: 12px;
       font-family: inherit;
       font-size: 1rem;
+      margin-bottom: 10px;
       transition: border 0.3s;
     }
-    input:focus, textarea:focus {
+    [data-theme="dark"] input, [data-theme="dark"] textarea, [data-theme="dark"] select {
+      background: #16213e; color: #e0e0ff; border-color: #334;
+    }
+    input:focus, textarea:focus, select:focus {
       outline: none;
       border-color: var(--primary);
     }
-    .back-btn {
-      background: #666;
-      font-size: 1rem;
-      padding: 10px 20px;
-    }
+    .back-btn { background: #666; font-size: 1rem; padding: 10px 20px; }
     .back-btn:hover { background: #444; }
-    .or-divider {
-      margin: 25px 0;
-      font-weight: 600;
-      color: #888;
-      position: relative;
-    }
+    .or-divider { margin: 25px 0; font-weight: 600; color: #888; position: relative; }
     .or-divider::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: #ddd;
-      z-index: 0;
+      content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #ddd; z-index: 0;
     }
-    .or-divider span {
-      background: white;
-      padding: 0 15px;
-      position: relative;
-      z-index: 1;
+    .or-divider span { background: var(--card-bg); padding: 0 15px; position: relative; z-index: 1; }
+    .final-buttons { margin-top: 25px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+    .icon-btn {
+      background: transparent;
+      color: var(--text);
+      font-size: 1.4rem;
+      padding: 8px;
+      border-radius: 50%;
+      width: 44px; height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #ddd;
     }
-    .final-buttons {
-      margin-top: 25px;
+    .icon-btn:hover { background: #eee; border-color: var(--primary); }
+    [data-theme="dark"] .icon-btn { border-color: #444; }
+    [data-theme="dark"] .icon-btn:hover { background: #334; }
+    .favorite-btn { color: #ccc; }
+    .favorite-btn.active { color: #ff6b6b; animation: pulse 0.5s; }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+    .health-tip {
+      background: linear-gradient(45deg, #a8edea, #fed6e3);
+      color: #333;
+      padding: 16px;
+      border-radius: 16px;
+      margin: 20px 0;
+      font-style: italic;
+      font-weight: 500;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    [data-theme="dark"] .health-tip {
+      background: linear-gradient(45deg, #1a3d3a, #3d1a3a);
+      color: #e0f7fa;
+    }
+    .nutrition-box {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+      text-align: center;
+    }
+    .nutrient {
+      background: #f0f0f5;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+    [data-theme="dark"] .nutrient { background: #16213e; }
+    .nutrient span { display: block; font-size: 1.8rem; color: var(--primary); font-weight: 700; }
+    .macro-form { display: none; background: var(--light); padding: 20px; border-radius: 16px; margin: 20px 0; }
+    .macro-form.active { display: block; }
+    .toggle-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--card-bg);
+      border: 2px solid #ddd;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    [data-theme="dark"] .toggle-btn { border-color: #444; }
+    @media print {
+      body, .container { background: white; color: black; }
+      button, .toggle-btn, .final-buttons { display: none !important; }
+      .health-tip { background: #f9f9f9; }
     }
   </style>
 </head>
 <body>
 
-  <h1>🍽️ Meal Roulette</h1>
-  <p>Let’s find your perfect meal — quick, smart, and delicious!</p>
+  <div class="toggle-btn" onclick="toggleTheme()" title="Toggle Dark Mode">Dark Mode</div>
+
+  <h1>Meal Roulette</h1>
+  <p>Smart, healthy, and delicious meals — just for you!</p>
 
   <div class="container">
 
+    <!-- Start Screen -->
+    <div id="startScreen" class="step active">
+      <button onclick="startRoulette()" style="font-size:1.5rem;padding:18px 40px;">Start Meal Roulette</button>
+      <div class="or-divider"><span>OR</span></div>
+      <button onclick="switchToIngredients()" style="background:#6c757d;">I Have Ingredients</button>
+      <button onclick="showFavorites()" style="background:#28a745;">Favorites (<span id="favCount">0</span>)</button>
+    </div>
+
     <!-- Step 1: Meal Type -->
-    <div id="step1" class="step active">
+    <div id="step1" class="step">
       <h2>What are you in the mood for?</h2>
-      <button onclick="setPreference('type', 'breakfast')">🥞 Breakfast</button>
-      <button onclick="setPreference('type', 'meal')">🍛 Lunch/Dinner</button>
+      <button onclick="setPreference('type', 'breakfast')">Breakfast</button>
+      <button onclick="setPreference('type', 'meal')">Lunch/Dinner</button>
     </div>
 
     <!-- Step 2: Time -->
     <div id="step2" class="step">
       <h2>How much time do you have?</h2>
-      <button onclick="setPreference('time', 'quick')">⚡ Quick (<30 min)</button>
-      <button onclick="setPreference('time', 'medium')">⏳ Medium (30-60 min)</button>
-      <button onclick="setPreference('time', 'long')">🍲 Elongated (>60 min)</button>
-      <div style="margin-top:15px;">
-        <button class="back-btn" onclick="goBack(1)">← Back</button>
-      </div>
+      <button onclick="setPreference('time', 'quick')">Quick (&lt;30 min)</button>
+      <button onclick="setPreference('time', 'medium')">Medium (30-60 min)</button>
+      <button onclick="setPreference('time', 'long')">Elongated (&gt;60 min)</button>
+      <button class="back-btn" onclick="goBack(1)">Back</button>
     </div>
 
     <!-- Step 3: Style -->
     <div id="step3" class="step">
       <h2>Any dietary preference?</h2>
-      <button onclick="setPreference('style', 'healthy')">🥗 Healthy (Low Oil)</button>
-      <button onclick="setPreference('style', 'indian')">🌶️ Indian</button>
-      <button onclick="setPreference('style', 'continental')">🍝 Continental</button>
-      <button onclick="setPreference('style', 'any')">🎲 Any</button>
-      <div style="margin-top:15px;">
-        <button class="back-btn" onclick="goBack(2)">← Back</button>
-      </div>
+      <button onclick="setPreference('style', 'healthy')">Healthy (Low Oil)</button>
+      <button onclick="setPreference('style', 'indian')">Indian</button>
+      <button onclick="setPreference('style', 'continental')">Continental</button>
+      <button onclick="setPreference('style', 'any')">Any</button>
+      <button class="back-btn" onclick="goBack(2)">Back</button>
     </div>
 
     <!-- Ingredient Mode -->
     <div id="ingredientMode" class="step">
-      <h2>🍅 I Have These Ingredients</h2>
+      <h2>I Have These Ingredients</h2>
       <div class="input-group">
-        <label>Type ingredients you have (comma-separated):</label>
-        <textarea id="userIngredients" rows="3" placeholder="e.g. potato, tomato, paneer, rice, onion"></textarea>
+        <label>Type ingredients (comma-separated):</label>
+        <textarea id="userIngredients" rows="3" placeholder="e.g. potato, tomato, paneer, rice"></textarea>
       </div>
       <button onclick="suggestFromIngredients()">Suggest Dish</button>
       <div class="or-divider"><span>OR</span></div>
       <button onclick="rollWithFilters()">Roll with Filters</button>
-      <div style="margin-top:15px;">
-        <button class="back-btn" onclick="goBack(3)">← Back</button>
-      </div>
+      <button class="back-btn" onclick="goBack(3)">Back</button>
+    </div>
+
+    <!-- Favorites -->
+    <div id="favorites" class="step">
+      <h2>Your Favorite Meals</h2>
+      <div id="favList"></div>
+      <button onclick="startOver()" style="margin-top:20px;">Back to Start</button>
     </div>
 
     <!-- Result -->
     <div id="result" class="step">
       <div id="mealDisplay"></div>
-      <div class="final-buttons">
-        <button onclick="startOver()">🎲 Roll Again</button>
-        <button onclick="switchToIngredients()" class="back-btn">🍴 I Have Ingredients</button>
-      </div>
-    </div>
 
-    <!-- Start Button -->
-    <div id="startScreen" class="step active">
-      <button onclick="startRoulette()" style="font-size:1.5rem;padding:18px 40px;">🎰 Start Meal Roulette</button>
-      <div class="or-divider"><span>OR</span></div>
-      <button onclick="switchToIngredients()" style="background:#6c757d;">🍅 I Have Ingredients</button>
+      <!-- Nutrition & Macros -->
+      <div id="nutritionInfo"></div>
+
+      <!-- Health Tip -->
+      <div id="healthTip" class="health-tip"></div>
+
+      <!-- Macro Calculator -->
+      <div class="macro-form" id="macroForm">
+        <h3>Daily Macro Goals</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <input type="number" id="age" placeholder="Age" min="15" max="80">
+          <select id="gender"><option value="male">Male</option><option value="female">Female</option></select>
+          <input type="number" id="weight" placeholder="Weight (kg)" min="30" max="150">
+          <select id="goal"><option value="maintain">Maintain</option><option value="lose">Lose Weight</option><option value="gain">Gain Muscle</option></select>
+        </div>
+        <button onclick="calculateMacros()" style="margin-top:10px;">Calculate</button>
+        <div id="macroResult" style="margin-top:15px;font-weight:600;"></div>
+      </div>
+
+      <div class="final-buttons">
+        <button onclick="startOver()">Roll Again</button>
+        <button onclick="switchToIngredients()" class="back-btn">I Have Ingredients</button>
+        <button onclick="printRecipe()" class="icon-btn" title="Print">Print</button>
+        <button id="favBtn" class="icon-btn favorite-btn" onclick="toggleFavorite()" title="Save">Heart</button>
+        <button onclick="toggleMacroForm()" class="icon-btn" title="Macros">Calculator</button>
+      </div>
     </div>
 
   </div>
 
   <script>
-    // Meal Database with metadata
+    // === Meal Database ===
     const meals = [
-      { name: "Uttapam", type: "breakfast", time: "medium", style: "indian", healthy: true, ingredients: ["rice", "urad dal", "onion", "tomato", "green chili", "coriander", "oil", "salt"] },
-      { name: "Roti + Bhindi + Salad + Dahi", type: "meal", time: "medium", style: "indian", healthy: true, ingredients: ["wheat flour", "bhindi", "onion", "tomato", "cucumber", "dahi", "oil", "spices"] },
-      { name: "Pav Bhaaji + Onion + Lemon", type: "meal", time: "medium", style: "indian", healthy: false, ingredients: ["pav", "potato", "peas", "cauliflower", "tomato", "onion", "lemon", "butter", "pav bhaji masala"] },
-      { name: "Moong Daal Chila + Green Chutney", type: "breakfast", time: "quick", style: "indian", healthy: true, ingredients: ["moong dal", "green chili", "ginger", "coriander", "mint", "lemon", "oil"] },
-      { name: "Paneer Bhurji + Paratha + Chaas", type: "meal", time: "medium", style: "indian", healthy: false, ingredients: ["paneer", "onion", "tomato", "capsicum", "wheat flour", "buttermilk"] },
-      { name: "Vaghareli Khichdi + Masala Chaas + Papad", type: "meal", time: "medium", style: "indian", healthy: true, ingredients: ["rice", "moong dal", "potato", "peas", "spices", "buttermilk", "papad"] },
-      { name: "Mix Veg Millet Paratha + Dahi", type: "meal", time: "medium", style: "indian", healthy: true, ingredients: ["bajra flour", "jowar flour", "carrot", "beans", "peas", "dahi"] },
-      { name: "Jita Rice + Moong Daal + Papad + Salad", type: "meal", time: "medium", style: "indian", healthy: true, ingredients: ["rice", "moong dal", "onion", "tomato", "cucumber", "papad"] },
-      { name: "Pink Sauce Pasta + Garlic Bread", type: "meal", time: "medium", style: "continental", healthy: false, ingredients: ["pasta", "milk", "cheese", "tomato puree", "butter", "garlic bread"] },
-      { name: "Paneer Veg Sandwich + Chutney", type: "breakfast", time: "quick", style: "indian", healthy: false, ingredients: ["bread", "paneer", "capsicum", "onion", "green chutney"] },
-      { name: "Jeera Rice + Dal Fry + Chaas", type: "meal", time: "medium", style: "indian", healthy: true, ingredients: ["rice", "toor dal", "jeera", "buttermilk"] },
-      { name: "Oats & Banana Smoothie", type: "breakfast", time: "quick", style: "continental", healthy: true, ingredients: ["oats", "banana", "milk", "honey"] },
-      { name: "Loki Chana Daal + Rotli + Salad", type: "meal", time: "medium", style: "indian", healthy: true, ingredients: ["loki", "chana dal", "wheat flour", "onion", "tomato", "cucumber"] },
-      { name: "Masala Dosa", type: "breakfast", time: "long", style: "indian", healthy: false, ingredients: ["dosa batter", "rice", "urad", "potato", "onion", "mustard seeds", "oil"] },
-      { name: "Bhakhri + Sev Tameta + Kanda + Achar", type: "meal", time: "medium", style: "indian", healthy: false, ingredients: ["bajra flour", "tomato", "sev", "onion", "pickle"] },
-      { name: "Masala Bhaat + Raita", type: "meal", time: "medium", style: "indian", healthy: true, ingredients: ["rice", "ivy gourd", "potato", "spices", "dahi", "cucumber"] },
-      { name: "Thepla + Chai", type: "breakfast", time: "quick", style: "indian", healthy: true, ingredients: ["wheat flour", "methi", "spices", "tea", "milk", "sugar"] },
-      { name: "Kanda Poha", type: "breakfast", time: "quick", style: "indian", healthy: true, ingredients: ["poha", "onion", "peanut", "mustard", "curry leaves"] },
-      { name: "Beans & Carrot Upma", type: "breakfast", time: "quick", style: "indian", healthy: true, ingredients: ["suji", "french beans", "carrot", "mustard", "curry leaves"] },
-      { name: "Noodles + Soup", type: "meal", time: "quick", style: "continental", healthy: false, ingredients: ["noodles", "mixed veg", "soy sauce", "veg stock", "carrot", "onion", "celery"] },
-      { name: "Veg Biryani + Raita", type: "meal", time: "long", style: "indian", healthy: false, ingredients: ["rice", "mixed veg", "spices", "dahi", "onion"] },
-      { name: "Undhiyu + Roti", type: "meal", time: "long", style: "indian", healthy: false, ingredients: ["surti papdi", "purple yam", "brinjal", "banana", "methi muthia", "spices", "wheat flour"] },
-      { name: "Manchurian + Fried Rice", type: "meal", time: "medium", style: "continental", healthy: false, ingredients: ["cabbage", "carrot", "cornflour", "soy sauce", "rice"] },
-      { name: "Daal Dhokli + Rice", type: "meal", time: "long", style: "indian", healthy: true, ingredients: ["wheat flour", "toor dal", "peanuts", "spices", "rice"] }
+      { name: "Uttapam", type: "breakfast", time: "medium", style: "indian", healthy: true, ingredients: ["rice", "urad dal", "onion", "tomato", "green chili", "coriander", "oil", "salt"], nutrition: { cal: 320, p: 10, c: 48, f: 8 } },
+      { name: "Roti + Bhindi + Salad + Dahi", type: "meal", time: "medium", style: "indian", healthy: true, ingredients: ["wheat flour", "bhindi", "onion", "tomato", "cucumber", "dahi", "oil", "spices"], nutrition: { cal: 420, p: 14, c: 62, f: 12 } },
+      { name: "Pav Bhaaji + Onion + Lemon", type: "meal", time: "medium", style: "indian", healthy: false, ingredients: ["pav", "potato", "peas", "cauliflower", "tomato", "onion", "lemon", "butter", "pav bhaji masala"], nutrition: { cal: 580, p: 16, c: 78, f: 24 } },
+      { name: "Moong Daal Chila + Green Chutney", type: "breakfast", time: "quick", style: "indian", healthy: true, ingredients: ["moong dal", "green chili", "ginger", "coriander", "mint", "lemon", "oil"], nutrition: { cal: 280, p: 18, c: 38, f: 6 } },
+      { name: "Paneer Bhurji + Paratha + Chaas", type: "meal", time: "medium", style: "indian", healthy: false, ingredients: ["paneer", "onion", "tomato", "capsicum", "wheat flour", "buttermilk"], nutrition: { cal: 550, p: 22, c: 56, f: 28 } },
+      { name: "Oats & Banana Smoothie", type: "breakfast", time: "quick", style: "continental", healthy: true, ingredients: ["oats", "banana", "milk", "honey"], nutrition: { cal: 300, p: 10, c: 52, f: 6 } },
+      { name: "Kanda Poha", type: "breakfast", time: "quick", style: "indian", healthy: true, ingredients: ["poha", "onion", "peanut", "mustard", "curry leaves"], nutrition: { cal: 260, p: 8, c: 42, f: 9 } },
+      { name: "Veg Biryani + Raita", type: "meal", time: "long", style: "indian", healthy: false, ingredients: ["rice", "mixed veg", "spices", "dahi", "onion"], nutrition: { cal: 620, p: 14, c: 92, f: 18 } },
+      { name: "Pink Sauce Pasta + Garlic Bread", type: "meal", time: "medium", style: "continental", healthy: false, ingredients: ["pasta", "milk", "cheese", "tomato puree", "butter", "garlic bread"], nutrition: { cal: 680, p: 22, c: 84, f: 32 } },
+      { name: "Daal Dhokli + Rice", type: "meal", time: "long", style: "indian", healthy: true, ingredients: ["wheat flour", "toor dal", "peanuts", "spices", "rice"], nutrition: { cal: 480, p: 20, c: 72, f: 14 } }
     ];
 
-    let preferences = {};
-    let filteredMeals = [...meals];
+    const healthTips = [
+      "Hydration is key — drink 8 glasses of water daily!",
+      "Add a fruit to every meal for fiber and vitamins.",
+      "Walk 20 mins after dinner to improve digestion.",
+      "Chew slowly — it helps portion control and absorption.",
+      "Sleep 7–8 hours: it regulates hunger hormones.",
+      "Spices like turmeric reduce inflammation naturally.",
+      "Replace fried snacks with roasted ones."
+    ];
 
-    function startRoulette() {
-      hideAll();
-      show("step1");
-    }
+    let preferences = {}, currentMeal = null, filteredMeals = [...meals];
 
-    function switchToIngredients() {
-      hideAll();
-      show("ingredientMode");
-    }
+    // === UI Helpers ===
+    function show(id) { hideAll(); document.getElementById(id).classList.add("active"); }
+    function hideAll() { document.querySelectorAll(".step").forEach(s => s.classList.remove("active")); }
+    function goBack(step) { hideAll(); show(`step${step}`); }
+    function startOver() { preferences = {}; currentMeal = null; hideAll(); show("startScreen"); updateFavCount(); }
 
-    function setPreference(key, value) {
-      preferences[key] = value;
-      nextStep();
-    }
-
+    // === Preferences ===
+    function setPreference(k, v) { preferences[k] = v; nextStep(); }
     function nextStep() {
       if (!preferences.type) return show("step1");
       if (!preferences.time) return show("step2");
@@ -276,11 +333,7 @@
       rollWithFilters();
     }
 
-    function goBack(step) {
-      hideAll();
-      show(`step${step}`);
-    }
-
+    // === Roll with Filters ===
     function rollWithFilters() {
       filteredMeals = meals.filter(m => {
         if (preferences.type && m.type !== preferences.type) return false;
@@ -294,48 +347,38 @@
       });
 
       if (filteredMeals.length === 0) {
-        alert("No meals match your filters! Try relaxing some preferences.");
+        alert("No meals match! Try different filters.");
         startOver();
         return;
       }
 
-      const meal = filteredMeals[Math.floor(Math.random() * filteredMeals.length)];
-      showResult(meal, "Based on your preferences");
+      currentMeal = filteredMeals[Math.floor(Math.random() * filteredMeals.length)];
+      showResult(currentMeal, "Your perfect meal is ready!");
     }
 
+    // === Ingredient Suggestion ===
     function suggestFromIngredients() {
       const input = document.getElementById("userIngredients").value.trim().toLowerCase();
-      if (!input) return alert("Please enter at least one ingredient!");
-
-      const userItems = input.split(',').map(i => i.trim()).filter(i => i);
+      if (!input) return alert("Enter ingredients!");
+      const userItems = input.split(',').map(i => i.trim());
 
       const scored = meals.map(meal => {
-        const matchCount = meal.ingredients.filter(ing => 
-          userItems.some(u => ing.includes(u) || u.includes(ing))
-        ).length;
-        return { meal, score: matchCount };
-      })
-      .filter(s => s.score > 0)
-      .sort((a, b) => b.score - a.score);
+        const match = meal.ingredients.filter(ing => userItems.some(u => ing.includes(u) || u.includes(ing))).length;
+        return { meal, score: match };
+      }).filter(s => s.score > 0).sort((a, b) => b.score - a.score);
 
-      if (scored.length === 0) {
-        alert("No dishes found with those ingredients. Try common ones like 'potato', 'rice', 'paneer'.");
-        return;
-      }
-
-      const best = scored[0].meal;
-      const coverage = ((scored[0].score / best.ingredients.length) * 100).toFixed(0);
-      showResult(best, `Best match: ${coverage}% ingredients covered`);
+      if (scored.length === 0) return alert("No match. Try: potato, rice, paneer...");
+      currentMeal = scored[0].meal;
+      const coverage = ((scored[0].score / currentMeal.ingredients.length) * 100).toFixed(0);
+      showResult(currentMeal, `Best match: ${coverage}% ingredients used`);
     }
 
+    // === Show Result ===
     function showResult(meal, subtitle) {
       const tags = [];
-      if (meal.type === 'breakfast') tags.push('Breakfast');
-      else tags.push('Meal');
-      if (meal.time === 'quick') tags.push('⚡ Quick');
-      if (meal.time === 'medium') tags.push('⏳ 30-60 min');
-      if (meal.time === 'long') tags.push('🍲 >60 min');
-      if (meal.healthy) tags.push('🥗 Healthy');
+      if (meal.type === 'breakfast') tags.push('Breakfast'); else tags.push('Meal');
+      if (meal.time === 'quick') tags.push('Quick'); else if (meal.time === 'medium') tags.push('30-60 min'); else tags.push('>60 min');
+      if (meal.healthy) tags.push('Healthy');
       tags.push(meal.style.charAt(0).toUpperCase() + meal.style.slice(1));
 
       document.getElementById("mealDisplay").innerHTML = `
@@ -347,31 +390,126 @@
           ${meal.ingredients.map(i => `• ${capitalize(i)}`).join('<br>')}
         </div>
       `;
+
+      // Nutrition
+      const n = meal.nutrition;
+      document.getElementById("nutritionInfo").innerHTML = `
+        <div class="nutrition-box">
+          <div class="nutrient"><span>${n.cal}</span>Calories</div>
+          <div class="nutrient"><span>${n.p}g</span>Protein</div>
+          <div class="nutrient"><span>${n.c}g</span>Carbs</div>
+          <div class="nutrient"><span>${n.f}g</span>Fat</div>
+        </div>
+      `;
+
+      // Health Tip
+      const tip = healthTips[Math.floor(Math.random() * healthTips.length)];
+      document.getElementById("healthTip").innerHTML = `"${tip}"`;
+
+      // Favorite Button
+      const isFav = isFavorite(meal.name);
+      const favBtn = document.getElementById("favBtn");
+      favBtn.classList.toggle("active", isFav);
+      favBtn.innerHTML = isFav ? 'Heart' : 'Heart';
+
       hideAll();
       show("result");
     }
 
-    function capitalize(str) {
-      return str.charAt(0).toUpperCase() + str.slice(1);
+    // === Favorites System ===
+    function isFavorite(name) {
+      const favs = JSON.parse(localStorage.getItem("mealFavs") || "[]");
+      return favs.includes(name);
     }
 
-    function startOver() {
-      preferences = {};
-      filteredMeals = [...meals];
+    function toggleFavorite() {
+      if (!currentMeal) return;
+      const favs = JSON.parse(localStorage.getItem("mealFavs") || "[]");
+      const idx = favs.indexOf(currentMeal.name);
+      if (idx === -1) favs.push(currentMeal.name);
+      else favs.splice(idx, 1);
+      localStorage.setItem("mealFavs", JSON.stringify(favs));
+      document.getElementById("favBtn").classList.toggle("active");
+      updateFavCount();
+    }
+
+    function updateFavCount() {
+      const favs = JSON.parse(localStorage.getItem("mealFavs") || "[]");
+      document.getElementById("favCount").textContent = favs.length;
+    }
+
+    function showFavorites() {
+      const favs = JSON.parse(localStorage.getItem("mealFavs") || "[]");
+      const list = document.getElementById("favList");
+      if (favs.length === 0) {
+        list.innerHTML = "<p>No favorites yet. Save some meals!</p>";
+      } else {
+        list.innerHTML = favs.map(name => {
+          const m = meals.find(x => x.name === name);
+          return `<div style="margin:15px 0;padding:15px;background:var(--light);border-radius:12px;">
+            <strong>${m.name}</strong><br>
+            <small>${m.ingredients.join(', ')}</small>
+          </div>`;
+        }).join('');
+      }
       hideAll();
-      show("startScreen");
+      show("favorites");
     }
 
-    function show(id) {
-      document.getElementById(id).classList.add("active");
+    // === Macro Calculator ===
+    function calculateMacros() {
+      const age = +document.getElementById("age").value;
+      const gender = document.getElementById("gender").value;
+      const weight = +document.getElementById("weight").value;
+      const goal = document.getElementById("goal").value;
+
+      if (!age || !weight) return alert("Enter age and weight!");
+
+      let bmr = gender === 'male' ? 10 * weight + 6.25 * 170 - 5 * age + 5 : 10 * weight + 6.25 * 170 - 5 * age - 161;
+      let tdee = bmr * 1.55; // moderately active
+
+      if (goal === 'lose') tdee *= 0.8;
+      if (goal === 'gain') tdee *= 1.2;
+
+      const protein = goal === 'gain' ? weight * 2 : weight * 1.6;
+      const fat = weight * 0.8;
+      const carbs = (tdee - (protein * 4 + fat * 9)) / 4;
+
+      document.getElementById("macroResult").innerHTML = `
+        <strong>Daily Goals:</strong><br>
+        Protein: ${Math.round(protein)}g | Carbs: ${Math.round(carbs)}g | Fat: ${Math.round(fat)}g<br>
+        Calories: ${Math.round(tdee)} kcal
+      `;
     }
 
-    function hideAll() {
-      document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+    function toggleMacroForm() {
+      document.getElementById("macroForm").classList.toggle("active");
     }
 
-    // Auto-start on load
+    // === Print ===
+    function printRecipe() {
+      window.print();
+    }
+
+    // === Dark Mode ===
+    function toggleTheme() {
+      const isDark = document.body.getAttribute("data-theme") === "dark";
+      document.body.setAttribute("data-theme", isDark ? "light" : "dark");
+      localStorage.setItem("theme", isDark ? "light" : "dark");
+    }
+
+    // === Utils ===
+    function capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
+
+    // === Navigation ===
+    function startRoulette() { hideAll(); show("step1"); }
+    function switchToIngredients() { hideAll(); show("ingredientMode"); }
+
+    // === Init ===
     window.onload = () => {
+      const saved = localStorage.getItem("theme");
+      if (saved) document.body.setAttribute("data-theme", saved);
+      updateFavCount();
       hideAll();
       show("startScreen");
     };
