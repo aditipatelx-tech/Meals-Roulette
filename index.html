@@ -19,6 +19,7 @@
       --text: #333;
       --light: #f8f9fa;
       --shadow: 0 15px 35px rgba(0,0,0,0.12);
+      --border: #ddd;
     }
     [data-theme="dark"] {
       --bg-gradient: linear-gradient(135deg, #2c1a3d, #1a0d2e);
@@ -26,6 +27,7 @@
       --text: #e0e0ff;
       --light: #16213e;
       --shadow: 0 15px 35px rgba(0,0,0,0.4);
+      --border: #444;
     }
     * { box-sizing: border-box; margin:0; padding:0; }
     body {
@@ -51,7 +53,35 @@
       border-radius: 24px;
       box-shadow: var(--shadow);
       transition: all 0.3s ease;
+      position: relative;
+      z-index: 1;
     }
+
+    /* Dark Mode Toggle */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+    }
+    .theme-toggle:hover { transform: scale(1.08); }
+    .theme-toggle .icon { display: none; }
+    .theme-toggle .icon-moon { display: block; }
+    [data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+    [data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
     button {
       background: var(--primary);
       color: white;
@@ -101,15 +131,14 @@
     input, textarea, select {
       width: 100%;
       padding: 12px;
-      border: 2px solid #ddd;
+      border: 2px solid var(--border);
       border-radius: 12px;
       font-family: inherit;
       font-size: 1rem;
       margin-bottom: 10px;
+      background: var(--card-bg);
+      color: var(--text);
       transition: border 0.3s;
-    }
-    [data-theme="dark"] input, [data-theme="dark"] textarea, [data-theme="dark"] select {
-      background: #16213e; color: #e0e0ff; border-color: #334;
     }
     input:focus, textarea:focus, select:focus {
       outline: none;
@@ -119,7 +148,7 @@
     .back-btn:hover { background: #444; }
     .or-divider { margin: 25px 0; font-weight: 600; color: #888; position: relative; }
     .or-divider::before {
-      content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #ddd; z-index: 0;
+      content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--border); z-index: 0;
     }
     .or-divider span { background: var(--card-bg); padding: 0 15px; position: relative; z-index: 1; }
     .final-buttons { margin-top: 25px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
@@ -133,10 +162,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 2px solid #ddd;
+      border: 2px solid var(--border);
     }
     .icon-btn:hover { background: #eee; border-color: var(--primary); }
-    [data-theme="dark"] .icon-btn { border-color: #444; }
+    [data-theme="dark"] .icon-btn { border-color: #555; }
     [data-theme="dark"] .icon-btn:hover { background: #334; }
     .favorite-btn { color: #ccc; }
     .favorite-btn.active { color: #ff6b6b; animation: pulse 0.5s; }
@@ -163,40 +192,29 @@
       text-align: center;
     }
     .nutrient {
-      background: #f0f0f5;
+      background: var(--light);
       padding: 12px;
       border-radius: 12px;
       font-weight: 600;
     }
-    [data-theme="dark"] .nutrient { background: #16213e; }
     .nutrient span { display: block; font-size: 1.8rem; color: var(--primary); font-weight: 700; }
     .macro-form { display: none; background: var(--light); padding: 20px; border-radius: 16px; margin: 20px 0; }
     .macro-form.active { display: block; }
-    .toggle-btn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: var(--card-bg);
-      border: 2px solid #ddd;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      font-size: 1.5rem;
-      cursor: pointer;
-      z-index: 1000;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    [data-theme="dark"] .toggle-btn { border-color: #444; }
     @media print {
       body, .container { background: white; color: black; }
-      button, .toggle-btn, .final-buttons { display: none !important; }
+      button, .theme-toggle, .final-buttons { display: none !important; }
       .health-tip { background: #f9f9f9; }
+      .nutrition-box, .ingredients { page-break-inside: avoid; }
     }
   </style>
 </head>
 <body>
 
-  <div class="toggle-btn" onclick="toggleTheme()" title="Toggle Dark Mode">Dark Mode</div>
+  <!-- Dark Mode Toggle -->
+  <div class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
+    <span class="icon icon-moon">Moon</span>
+    <span class="icon icon-sun">Sun</span>
+  </div>
 
   <h1>Meal Roulette</h1>
   <p>Smart, healthy, and delicious meals — just for you!</p>
@@ -261,7 +279,7 @@
     <div id="result" class="step">
       <div id="mealDisplay"></div>
 
-      <!-- Nutrition & Macros -->
+      <!-- Nutrition -->
       <div id="nutritionInfo"></div>
 
       <!-- Health Tip -->
@@ -292,7 +310,7 @@
   </div>
 
   <script>
-    // === Meal Database ===
+    // Meal Database with nutrition
     const meals = [
       { name: "Uttapam", type: "breakfast", time: "medium", style: "indian", healthy: true, ingredients: ["rice", "urad dal", "onion", "tomato", "green chili", "coriander", "oil", "salt"], nutrition: { cal: 320, p: 10, c: 48, f: 8 } },
       { name: "Roti + Bhindi + Salad + Dahi", type: "meal", time: "medium", style: "indian", healthy: true, ingredients: ["wheat flour", "bhindi", "onion", "tomato", "cucumber", "dahi", "oil", "spices"], nutrition: { cal: 420, p: 14, c: 62, f: 12 } },
@@ -318,13 +336,13 @@
 
     let preferences = {}, currentMeal = null, filteredMeals = [...meals];
 
-    // === UI Helpers ===
+    // UI Helpers
     function show(id) { hideAll(); document.getElementById(id).classList.add("active"); }
     function hideAll() { document.querySelectorAll(".step").forEach(s => s.classList.remove("active")); }
     function goBack(step) { hideAll(); show(`step${step}`); }
     function startOver() { preferences = {}; currentMeal = null; hideAll(); show("startScreen"); updateFavCount(); }
 
-    // === Preferences ===
+    // Preferences
     function setPreference(k, v) { preferences[k] = v; nextStep(); }
     function nextStep() {
       if (!preferences.type) return show("step1");
@@ -333,7 +351,7 @@
       rollWithFilters();
     }
 
-    // === Roll with Filters ===
+    // Roll with Filters
     function rollWithFilters() {
       filteredMeals = meals.filter(m => {
         if (preferences.type && m.type !== preferences.type) return false;
@@ -356,7 +374,7 @@
       showResult(currentMeal, "Your perfect meal is ready!");
     }
 
-    // === Ingredient Suggestion ===
+    // Ingredient Suggestion
     function suggestFromIngredients() {
       const input = document.getElementById("userIngredients").value.trim().toLowerCase();
       if (!input) return alert("Enter ingredients!");
@@ -373,7 +391,7 @@
       showResult(currentMeal, `Best match: ${coverage}% ingredients used`);
     }
 
-    // === Show Result ===
+    // Show Result
     function showResult(meal, subtitle) {
       const tags = [];
       if (meal.type === 'breakfast') tags.push('Breakfast'); else tags.push('Meal');
@@ -391,7 +409,6 @@
         </div>
       `;
 
-      // Nutrition
       const n = meal.nutrition;
       document.getElementById("nutritionInfo").innerHTML = `
         <div class="nutrition-box">
@@ -402,11 +419,9 @@
         </div>
       `;
 
-      // Health Tip
       const tip = healthTips[Math.floor(Math.random() * healthTips.length)];
       document.getElementById("healthTip").innerHTML = `"${tip}"`;
 
-      // Favorite Button
       const isFav = isFavorite(meal.name);
       const favBtn = document.getElementById("favBtn");
       favBtn.classList.toggle("active", isFav);
@@ -416,7 +431,7 @@
       show("result");
     }
 
-    // === Favorites System ===
+    // Favorites
     function isFavorite(name) {
       const favs = JSON.parse(localStorage.getItem("mealFavs") || "[]");
       return favs.includes(name);
@@ -456,7 +471,7 @@
       show("favorites");
     }
 
-    // === Macro Calculator ===
+    // Macro Calculator
     function calculateMacros() {
       const age = +document.getElementById("age").value;
       const gender = document.getElementById("gender").value;
@@ -466,7 +481,7 @@
       if (!age || !weight) return alert("Enter age and weight!");
 
       let bmr = gender === 'male' ? 10 * weight + 6.25 * 170 - 5 * age + 5 : 10 * weight + 6.25 * 170 - 5 * age - 161;
-      let tdee = bmr * 1.55; // moderately active
+      let tdee = bmr * 1.55;
 
       if (goal === 'lose') tdee *= 0.8;
       if (goal === 'gain') tdee *= 1.2;
@@ -486,26 +501,27 @@
       document.getElementById("macroForm").classList.toggle("active");
     }
 
-    // === Print ===
+    // Print
     function printRecipe() {
       window.print();
     }
 
-    // === Dark Mode ===
+    // Dark Mode
     function toggleTheme() {
-      const isDark = document.body.getAttribute("data-theme") === "dark";
-      document.body.setAttribute("data-theme", isDark ? "light" : "dark");
-      localStorage.setItem("theme", isDark ? "light" : "dark");
+      const body = document.body;
+      const isDark = body.getAttribute('data-theme') === 'dark';
+      body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      localStorage.setItem('theme', isDark ? 'light' : 'dark');
     }
 
-    // === Utils ===
+    // Utils
     function capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
 
-    // === Navigation ===
+    // Navigation
     function startRoulette() { hideAll(); show("step1"); }
     function switchToIngredients() { hideAll(); show("ingredientMode"); }
 
-    // === Init ===
+    // Init
     window.onload = () => {
       const saved = localStorage.getItem("theme");
       if (saved) document.body.setAttribute("data-theme", saved);
